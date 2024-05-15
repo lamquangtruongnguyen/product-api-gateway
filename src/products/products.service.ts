@@ -1,16 +1,17 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import {
-  CreateProductDto,
   OrderRequestDto,
   PRODUCT_PACKAGE_NAME,
   PRODUCT_SERVICE_NAME,
   ProductServiceClient,
-  SearchProductDto,
-  UpdateProductDto,
 } from 'clt-jwat-common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { FindOneProductInput } from './dto/findOneProduct.dto';
+import { GraphQLError } from 'graphql';
+import { SearchProductInput } from './dto/searchProduct.dto';
+import { CreateProductInput } from './dto/createProduct.dto';
+import { UpdateProductInput } from './dto/updateProduct.dto';
 
 @Injectable()
 export class ProductsService implements OnModuleInit {
@@ -22,42 +23,54 @@ export class ProductsService implements OnModuleInit {
       this.client.getService<ProductServiceClient>(PRODUCT_SERVICE_NAME);
   }
 
-  async find(searchProductDto: SearchProductDto) {
-    const data = await lastValueFrom(
-      this.productsService.searchProduct(searchProductDto),
+  async find(searchProductInput?: SearchProductInput) {
+    const res = await lastValueFrom(
+      this.productsService.searchProduct(searchProductInput),
     );
-    return data.products;
+    if (!res.products)
+      throw new GraphQLError(res.message, {
+        extensions: { code: res.code },
+      });
+    return res.products;
   }
 
   async findOne(findOneProduct: FindOneProductInput) {
     const res = await lastValueFrom(
       this.productsService.findProductById(findOneProduct),
     );
+    if (!res.product)
+      throw new GraphQLError(res.message, {
+        extensions: { code: res.code },
+      });
     return res.product;
   }
 
-  async create(createProductDto: CreateProductDto) {
-    return await lastValueFrom(
-      this.productsService.createProduct(createProductDto),
-    );
-  }
-
-  async update(updateProductDto: UpdateProductDto) {
-    return await lastValueFrom(
-      this.productsService.updateProduct(updateProductDto),
-    );
-  }
-
-  async remove(id: string) {
+  async create(createProductInput: CreateProductInput) {
     const res = await lastValueFrom(
-      this.productsService.findProductById({ id }),
+      this.productsService.createProduct(createProductInput),
     );
+    if (!res.product)
+      throw new GraphQLError(res.message, { extensions: { code: res.code } });
+    return res.product;
+  }
+
+  async update(id, updateProductInput: UpdateProductInput) {
+    const res = await lastValueFrom(
+      this.productsService.updateProduct({ ...updateProductInput, id }),
+    );
+    if (!res.product)
+      throw new GraphQLError(res.message, { extensions: { code: res.code } });
+    return res.product;
+  }
+
+  async remove(findOneProduct: FindOneProductInput) {
+    const res = await lastValueFrom(
+      this.productsService.findProductById(findOneProduct),
+    );
+    if (!res.product)
+      throw new GraphQLError(res.message, { extensions: { code: res.code } });
     return res.message;
   }
 
-  async orderRequest(orderRequestDto: OrderRequestDto) {
-    return await lastValueFrom(
-      this.productsService.orderRequest(orderRequestDto),
-    );
-  }
+  async orderRequest(orderRequestDto: OrderRequestDto) {}
 }

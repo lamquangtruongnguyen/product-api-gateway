@@ -1,30 +1,44 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int, ID } from '@nestjs/graphql';
 import { ProductsService } from './products.service';
 import { Product } from './entities/product.entity';
 import { CreateProductInput } from './dto/createProduct.dto';
-import { UpdateProductDto } from './dto/updateProduct.dto';
-import { SearchProductDto } from 'clt-jwat-common';
 import { FindOneProductInput } from './dto/findOneProduct.dto';
+import { SearchProductInput } from './dto/searchProduct.dto';
+import { UpdateProductInput } from './dto/updateProduct.dto';
+import { ParseUUIDPipe } from '@nestjs/common';
 
 @Resolver(() => Product)
 export class ProductsResolver {
   constructor(private readonly productsService: ProductsService) {}
 
-  @Query(() => [Product], { name: 'products' })
+  @Query((returns) => [Product], { name: 'products' })
   find(
-    @Args('searchProductDto', { nullable: true })
-    searchProductDto: SearchProductDto,
+    @Args('searchProductInput', { nullable: true })
+    searchProductInput?: SearchProductInput,
   ) {
-    return this.productsService.find(searchProductDto);
+    return this.productsService.find(searchProductInput);
   }
 
-  @Query(() => Product, { name: 'product' })
+  @Query((returns) => Product, { name: 'product' })
   findOne(@Args('findOneProduct') findOneProduct: FindOneProductInput) {
     return this.productsService.findOne(findOneProduct);
   }
 
-  // @Mutation(() => String)
-  // remove(@Args('id') id: string) {
-  //   return this.productsService.remove(id);
-  // }
+  @Mutation((returns) => Product)
+  create(@Args('createProductInput') createProductInput: CreateProductInput) {
+    return this.productsService.create(createProductInput);
+  }
+
+  @Mutation((returns) => Product)
+  update(
+    @Args('id', ParseUUIDPipe) id: string,
+    @Args('updateProductInput') updateProductInput: UpdateProductInput,
+  ) {
+    return this.productsService.update(id, updateProductInput);
+  }
+
+  @Mutation(() => Product)
+  remove(@Args('findOneProduct') findOneProduct: FindOneProductInput) {
+    return this.productsService.remove(findOneProduct);
+  }
 }
