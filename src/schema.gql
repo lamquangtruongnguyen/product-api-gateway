@@ -20,9 +20,35 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type OrderItem {
+  createdAt: DateTime!
+  deletedAt: DateTime!
+  updatedAt: DateTime!
+  orderId: String!
+  productId: String!
+  quantity: Int!
+  price: Float!
+  product: Product
+}
+
+type Order {
+  createdAt: DateTime!
+  deletedAt: DateTime!
+  updatedAt: DateTime!
+  id: String!
+  phoneNumber: String!
+  email: String!
+  customerName: String!
+  address: String!
+  status: String!
+  orderItems: [OrderItem!]!
+}
+
 type Query {
   products(searchProductInput: SearchProductInput): [Product!]!
   product(findOneProduct: FindOneProductInput!): Product!
+  findOrderById(orderIdDto: OrderIdDto!): Order!
+  findOrderWithFilter(orderFilterDto: OrderFilterDto!): [Order!]!
 }
 
 input SearchProductInput {
@@ -39,11 +65,30 @@ input FindOneProductInput {
   id: ID!
 }
 
+input OrderIdDto {
+  id: String!
+}
+
+input OrderFilterDto {
+  phoneNumber: String
+  email: String
+  customerName: String
+  address: String
+  status: String
+  minTotal: Float
+  maxTotal: Float
+  fromDate: DateTime
+  toDate: DateTime
+}
+
 type Mutation {
   create(createProductInput: CreateProductInput!): Product!
   update(findOneProduct: FindOneProductInput!, updateProductInput: UpdateProductInput!): Product!
   remove(findOneProduct: FindOneProductInput!): Product!
   orderRequest(orderRequestInput: OrderRequestInput!): [Product!]!
+  createOrder(createOrderDto: CreateOrderDto!): Order!
+  updateOrderStatus(updateOrderDto: UpdateOrderStatusDto!): Order!
+  deleteOrder(orderIdDto: OrderIdDto!): Order!
 }
 
 input CreateProductInput {
@@ -71,4 +116,22 @@ input OrderRequestInput {
 input OrderRequestItem {
   productId: ID!
   quantity: Int!
+}
+
+input CreateOrderDto {
+  phoneNumber: String!
+  customerName: String!
+  address: String!
+  email: String!
+  orderProducts: [OrderProduct!]!
+}
+
+input OrderProduct {
+  productId: String!
+  quantity: Float!
+}
+
+input UpdateOrderStatusDto {
+  orderId: String!
+  status: String!
 }

@@ -16,6 +16,12 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@commons/*" : ["./src/commons/*"],
+      "@products/*" : ["./src/products/*"],
+      "@orders/*" : ["./src/orders/*"],
+      "@consts/*" : ["./src/consts/*"],
+    }
   }
 }

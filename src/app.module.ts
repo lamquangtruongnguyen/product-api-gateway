@@ -1,8 +1,10 @@
-import { HttpStatus, Module } from '@nestjs/common';
-import { ProductsModule } from './products/products.module';
-import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
+import { GraphQLModule } from '@nestjs/graphql';
+import { HttpStatus, Module } from '@nestjs/common';
 import { ApolloServerErrorCode } from '@apollo/server/errors';
+
+import { OrdersModule } from './orders/orders.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -47,6 +49,7 @@ import { ApolloServerErrorCode } from '@apollo/server/errors';
         };
       },
     }),
+    OrdersModule,
   ],
   controllers: [],
   providers: [],
