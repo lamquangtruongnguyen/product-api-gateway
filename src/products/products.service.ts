@@ -1,6 +1,5 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import {
-  OrderRequestDto,
   PRODUCT_PACKAGE_NAME,
   PRODUCT_SERVICE_NAME,
   ProductServiceClient,
@@ -12,6 +11,7 @@ import { GraphQLError } from 'graphql';
 import { SearchProductInput } from './dto/searchProduct.dto';
 import { CreateProductInput } from './dto/createProduct.dto';
 import { UpdateProductInput } from './dto/updateProduct.dto';
+import { OrderRequestInput } from './dto/orderRequest.dto';
 
 @Injectable()
 export class ProductsService implements OnModuleInit {
@@ -69,8 +69,15 @@ export class ProductsService implements OnModuleInit {
     );
     if (!res.product)
       throw new GraphQLError(res.message, { extensions: { code: res.code } });
-    return res.message;
+    return res.product;
   }
 
-  async orderRequest(orderRequestDto: OrderRequestDto) {}
+  async orderRequest(orderRequestInput: OrderRequestInput) {
+    const res = await lastValueFrom(
+      this.productsService.orderRequest(orderRequestInput),
+    );
+    if (!res.products)
+      throw new GraphQLError(res.message, { extensions: { code: res.code } });
+    return res.products;
+  }
 }

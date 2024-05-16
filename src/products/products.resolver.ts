@@ -1,11 +1,11 @@
-import { Resolver, Query, Mutation, Args, Int, ID } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { ProductsService } from './products.service';
 import { Product } from './entities/product.entity';
 import { CreateProductInput } from './dto/createProduct.dto';
 import { FindOneProductInput } from './dto/findOneProduct.dto';
 import { SearchProductInput } from './dto/searchProduct.dto';
 import { UpdateProductInput } from './dto/updateProduct.dto';
-import { ParseUUIDPipe } from '@nestjs/common';
+import { OrderRequestInput } from './dto/orderRequest.dto';
 
 @Resolver(() => Product)
 export class ProductsResolver {
@@ -31,14 +31,21 @@ export class ProductsResolver {
 
   @Mutation((returns) => Product)
   update(
-    @Args('id', ParseUUIDPipe) id: string,
+    @Args('findOneProduct') findOneProduct: FindOneProductInput,
     @Args('updateProductInput') updateProductInput: UpdateProductInput,
   ) {
-    return this.productsService.update(id, updateProductInput);
+    return this.productsService.update(findOneProduct, updateProductInput);
   }
 
-  @Mutation(() => Product)
+  @Mutation((returns) => Product)
   remove(@Args('findOneProduct') findOneProduct: FindOneProductInput) {
     return this.productsService.remove(findOneProduct);
+  }
+
+  @Mutation((returns) => [Product])
+  orderRequest(
+    @Args('orderRequestInput') orderRequestInput: OrderRequestInput,
+  ) {
+    return this.productsService.orderRequest(orderRequestInput);
   }
 }

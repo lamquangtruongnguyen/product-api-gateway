@@ -4,9 +4,9 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
-  IsPositive,
   IsString,
   Length,
+  Min,
 } from 'class-validator';
 import { CreateProductDto } from 'clt-jwat-common';
 
@@ -30,6 +30,9 @@ export class CreateProductInput implements CreateProductDto {
   @IsOptional()
   @Transform(({ value }) => value.trim())
   @IsString()
+  @Length(10, 200, {
+    message: 'Category must be between 10 and 200 characters',
+  })
   category?: string;
 
   @Field({ nullable: true })
@@ -40,11 +43,11 @@ export class CreateProductInput implements CreateProductDto {
 
   @Field()
   @IsNumber()
-  @IsPositive()
+  @Min(0, { message: 'price must be at least 0' })
   price: number;
 
   @Field()
   @IsNumber()
-  @IsPositive()
+  @Min(0, { message: 'quantity must be at least 0' })
   quantity: number;
 }

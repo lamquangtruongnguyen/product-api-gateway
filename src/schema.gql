@@ -36,13 +36,14 @@ input SearchProductInput {
 }
 
 input FindOneProductInput {
-  id: String!
+  id: ID!
 }
 
 type Mutation {
   create(createProductInput: CreateProductInput!): Product!
-  update(id: String!, updateProductInput: UpdateProductInput!): Product!
+  update(findOneProduct: FindOneProductInput!, updateProductInput: UpdateProductInput!): Product!
   remove(findOneProduct: FindOneProductInput!): Product!
+  orderRequest(orderRequestInput: OrderRequestInput!): [Product!]!
 }
 
 input CreateProductInput {
@@ -61,4 +62,13 @@ input UpdateProductInput {
   description: String
   price: Float
   quantity: Float
+}
+
+input OrderRequestInput {
+  items: [OrderRequestItem!]!
+}
+
+input OrderRequestItem {
+  productId: ID!
+  quantity: Int!
 }
